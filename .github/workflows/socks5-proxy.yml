@@ -14,9 +14,9 @@ jobs:
       - name: Install chisel
         working-directory: ${{ runner.temp }}
         env:
-          version: v1.7.6
+          version: 1.7.6
         run: |
-          aria2c -x 16 "https://github.com/jpillora/chisel/releases/download/${version}/chisel_${version}_linux_amd64.gz"
+          aria2c -x 16 "https://github.com/jpillora/chisel/releases/latest/download/chisel_${version}_linux_amd64.gz"
           gzip -d chisel_${version}_linux_amd64.gz
           mv chisel_${version}_linux_amd64 /usr/local/bin/chisel
           chmod +x /usr/local/bin/chisel
