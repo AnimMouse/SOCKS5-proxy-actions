@@ -1,0 +1,37 @@
+name: Host SOCKS5 Proxy
+on:
+  workflow_dispatch:
+    inputs:
+      time-duration:
+        description: Time to run chisel
+        required: true
+        default: 10m
+        
+jobs:
+  proxy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install chisel
+        working-directory: ${{ runner.temp }}
+        env:
+          version: v1.7.6
+        run: |
+          aria2c -x 16 "https://github.com/jpillora/chisel/releases/download/${version}/chisel_${version}_linux_amd64.gz"
+          gzip -d chisel_${version}_linux_amd64.gz
+          mv chisel_${version}_linux_amd64 /usr/local/bin/chisel
+          chmod +x /usr/local/bin/chisel
+          
+      - name: Setup Cloudflare Tunnel client
+        uses: AnimMouse/setup-cloudflared@v1
+        with:
+          cloudflare_tunnel_certificate: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
+          cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
+          cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
+          cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+          
+      - name: Run chisel
+        run: timeout "${{ github.event.inputs.time-duration }}" chisel server --socks5 || true
+        
+      - name: Shutdown and view logs of Cloudflare Tunnel
+        if: always()
+        uses: AnimMouse/setup-cloudflared/shutdown@v1
