@@ -1,4 +1,4 @@
-name: Host SOCKS5 Proxy
+name: Host Chisel SOCKS5 Proxy
 on:
   workflow_dispatch:
     inputs:
@@ -8,7 +8,7 @@ on:
         default: 10m
         
 jobs:
-  proxy:
+  socks5-proxy:
     runs-on: ubuntu-latest
     steps:
       - name: Install chisel
