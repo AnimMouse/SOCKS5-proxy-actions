@@ -15,7 +15,8 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: |
           version=$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.tag_name')
-          wget -O - https://github.com/jpillora/chisel/releases/download/$version/chisel_${version}_linux_amd64.gz | gzip -d > chisel/chisel
+          mkdir chisel
+          wget -O - https://github.com/jpillora/chisel/releases/download/$version/chisel_${version/v}_linux_amd64.gz | gzip -d > chisel/chisel
           chmod +x chisel/chisel
           
       - name: Install chisel
