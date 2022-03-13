@@ -11,20 +11,21 @@ jobs:
   socks5-proxy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install chisel
+      - name: Download latest chisel
         working-directory: ${{ runner.temp }}
-        env:
-          version: 1.7.6
         run: |
-          aria2c -x 16 "https://github.com/jpillora/chisel/releases/latest/download/chisel_${version}_linux_amd64.gz"
-          gzip -d chisel_${version}_linux_amd64.gz
-          mv chisel_${version}_linux_amd64 /usr/local/bin/chisel
-          chmod +x /usr/local/bin/chisel
+          version=$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.tag_name')
+          wget -O - https://github.com/jpillora/chisel/releases/download/$version/chisel_${version}_linux_amd64.gz | gzip -d > chisel/chisel
+          chmod +x chisel/chisel
+          
+      - name: Install chisel
+        uses: AnimMouse/tool-cache@v1
+        with:
+          folder_name: chisel
           
       - name: Setup Cloudflare Tunnel client
         uses: AnimMouse/setup-cloudflared@v1
         with:
-          cloudflare_tunnel_certificate: ${{ secrets.CLOUDFLARE_TUNNEL_CERTIFICATE }}
           cloudflare_tunnel_credential: ${{ secrets.CLOUDFLARE_TUNNEL_CREDENTIAL }}
           cloudflare_tunnel_configuration: ${{ secrets.CLOUDFLARE_TUNNEL_CONFIGURATION }}
           cloudflare_tunnel_id: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
